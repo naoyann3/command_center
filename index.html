@@ -133,12 +133,13 @@
       background: var(--bg);
       color: var(--t1);
       overflow-x: hidden;
+      font-size: 13px;
     }
 
     .cmd-header {
       background: linear-gradient(180deg, #0d1117, var(--bg));
-      border-bottom: 1px solid var(--bdr);
-      padding: 12px 24px;
+      border-bottom: 2px solid var(--bdr);
+      padding: 14px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -146,7 +147,7 @@
 
     .cmd-title {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 18px;
+      font-size: 20px;
       color: var(--green);
       letter-spacing: 4px;
       text-transform: uppercase;
@@ -154,18 +155,18 @@
 
     .cmd-title span {
       color: var(--red);
-      font-size: 10px;
-      margin-left: 8px;
-      padding: 2px 6px;
+      font-size: 11px;
+      margin-left: 10px;
+      padding: 3px 8px;
       border: 1px solid var(--red);
-      border-radius: 2px;
+      border-radius: 4px;
     }
 
     .cmd-status {
-      font-size: 10px;
+      font-size: 13px;
       color: var(--t2);
       display: flex;
-      gap: 16px;
+      gap: 20px;
       align-items: center;
     }
 
@@ -228,24 +229,24 @@
 
     .panel-label {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
+      font-size: 13px;
       color: var(--green);
       letter-spacing: 3px;
       text-transform: uppercase;
     }
 
     .panel-tag {
-      font-size: 9px;
+      font-size: 11px;
       color: var(--t3);
       border: 1px solid var(--bdr2);
-      padding: 1px 6px;
-      border-radius: 2px;
+      padding: 2px 8px;
+      border-radius: 4px;
     }
 
     .panel-body {
       flex: 1;
       overflow: auto;
-      padding: 8px;
+      padding: 12px;
     }
 
     .panel-body::-webkit-scrollbar {
@@ -279,12 +280,12 @@
       background: var(--card);
       border: 1px solid var(--bdr);
       color: var(--t2);
-      padding: 4px 10px;
-      font-size: 10px;
+      padding: 6px 12px;
+      font-size: 12px;
       font-family: 'Roboto Mono', monospace;
       cursor: pointer;
       transition: all .15s;
-      border-radius: 2px;
+      border-radius: 4px;
     }
 
     .btn-asset:hover {
@@ -301,18 +302,18 @@
 
     .ctrl-row {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 8px;
-      padding: 6px 10px;
+      margin-bottom: 12px;
+      padding: 10px 15px;
       background: var(--card);
       border: 1px solid var(--bdr);
-      border-radius: 2px;
+      border-radius: 4px;
     }
 
     .ctrl-label {
-      font-size: 9px;
+      font-size: 11px;
       color: var(--t3);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -322,22 +323,22 @@
       background: var(--bg);
       border: 1px solid var(--bdr);
       color: var(--amber);
-      padding: 4px 8px;
-      width: 90px;
+      padding: 6px 10px;
+      width: 100px;
       font-family: 'Roboto Mono', monospace;
-      font-size: 12px;
-      border-radius: 2px;
+      font-size: 14px;
+      border-radius: 4px;
     }
 
     .currency-btn {
       background: var(--bg);
       border: 1px solid var(--bdr);
       color: var(--t2);
-      padding: 4px 10px;
-      font-size: 10px;
+      padding: 6px 14px;
+      font-size: 12px;
       font-family: 'Roboto Mono', monospace;
       cursor: pointer;
-      border-radius: 2px;
+      border-radius: 4px;
       transition: all .15s;
     }
 
@@ -440,17 +441,18 @@
       text-align: left;
       color: var(--t3);
       font-weight: 400;
-      padding: 6px 8px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--bdr);
       text-transform: uppercase;
       letter-spacing: 1px;
-      font-size: 9px;
+      font-size: 11px;
     }
 
     .fundamentals-table td {
-      padding: 6px 8px;
+      padding: 10px 12px;
       border-bottom: 1px solid rgba(30, 42, 58, .5);
       color: var(--t1);
+      font-size: 12px;
     }
 
     .fundamentals-table tr:hover {
@@ -520,8 +522,8 @@
 
     .loading-text {
       color: var(--green);
-      font-size: 11px;
-      margin-top: 8px;
+      font-size: 13px;
+      margin-top: 10px;
       letter-spacing: 2px;
     }
 
@@ -530,9 +532,9 @@
       color: var(--green);
       border: 1px solid var(--bdr2);
       font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      padding: 2px 4px;
-      border-radius: 2px;
+      font-size: 13px;
+      padding: 4px 6px;
+      border-radius: 4px;
       outline: none;
       cursor: pointer;
       text-transform: uppercase;
@@ -691,13 +693,19 @@
       });
     }
 
-    function updateDashboard() {
+    function updateDashboard(specificSlotIdx = null) {
       renderFundamentals();
-      currentSlots.forEach((key, idx) => {
+      if (specificSlotIdx !== null) {
+        const key = currentSlots[specificSlotIdx];
         const d = shields[key];
-        if (d) loadTV(`tv-slot-${idx}`, d.symbol);
-      });
-      loadHeatmap();
+        if (d) loadTV(`tv-slot-${specificSlotIdx}`, d.symbol);
+      } else {
+        currentSlots.forEach((key, idx) => {
+          const d = shields[key];
+          if (d) loadTV(`tv-slot-${idx}`, d.symbol);
+        });
+        loadHeatmap();
+      }
     }
 
     function initSlots() {
@@ -713,10 +721,10 @@
         sel.onchange = (e) => {
           currentSlots[idx] = e.target.value;
           localStorage.setItem('cc-slots', JSON.stringify(currentSlots));
-          updateDashboard();
+          updateDashboard(idx); // Only update this specific slot
         };
       });
-      updateDashboard();
+      updateDashboard(); // Initial full load
     }
 
     function loadHeatmap() {
@@ -728,7 +736,7 @@
       c.appendChild(s);
     }
 
-    function reloadAllTV() { updateDashboard(); } // Alias for theme toggle
+    function reloadAllTV() { updateDashboard(); } // Full update on theme change
 
     function toggleTheme() {
       document.documentElement.classList.toggle('light');
