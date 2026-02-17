@@ -139,10 +139,64 @@
     .cmd-header {
       background: linear-gradient(180deg, #0d1117, var(--bg));
       border-bottom: 2px solid var(--bdr);
-      padding: 14px 28px;
+      padding: 10px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      height: 60px;
+      box-sizing: border-box;
+    }
+
+    .sentiment-radar {
+      display: flex;
+      gap: 20px;
+      padding: 10px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--bdr2);
+      height: 120px;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    .radar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      padding: 6px 16px;
+      border-radius: 4px;
+      border: 1px solid var(--bdr);
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .fng-value {
+      font-size: 24px;
+      font-weight: bold;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .fng-label {
+      font-size: 11px;
+      color: var(--t2);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fng-state {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--t1);
+    }
+
+    .radar-vix {
+      flex: 1;
+      height: 100%;
+      max-width: 300px;
+      border-radius: 4px;
+      overflow: hidden;
     }
 
     .cmd-title {
@@ -197,10 +251,82 @@
 
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
-      gap: 2px;
-      height: calc(100vh - 52px);
-      padding: 2px;
+      grid-template-columns: 450px 1fr 300px;
+      gap: 20px;
+      padding: 20px;
+      height: calc(100% - 100px);
+      /* Header 60 + Ticker 40 */
+      box-sizing: border-box;
+    }
+
+    /* Ticker Styles */
+    .ticker-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: #000;
+      border-top: 1px solid var(--green);
+      overflow: hidden;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+    }
+
+    .ticker-label {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--green);
+      font-size: 11px;
+      background: #000;
+      padding-right: 10px;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid var(--bdr2);
+    }
+
+    .ticker-container {
+      position: relative;
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .ticker-item {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--green);
+      animation: ticker-flow 25s linear forwards;
+      right: -100%;
+      /* Start off-screen right */
+    }
+
+    @keyframes ticker-flow {
+      0% {
+        right: -500px;
+      }
+
+      100% {
+        right: 100%;
+      }
+    }
+
+    .whale-val {
+      color: var(--amber);
+      margin-left: 8px;
+    }
+
+    .whale-hash {
+      color: var(--t3);
+      margin-left: 8px;
+      font-size: 10px;
     }
 
     @media(max-width:1200px) {
@@ -247,6 +373,7 @@
       flex: 1;
       overflow: auto;
       padding: 12px;
+      position: relative;
     }
 
     .panel-body::-webkit-scrollbar {
@@ -535,14 +662,36 @@
       font-size: 13px;
       padding: 4px 6px;
       border-radius: 4px;
-      outline: none;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
 
-    .slot-select option {
-      background: var(--panel);
-      color: var(--t1);
+      .slot-select option {
+        background: var(--panel);
+        color: var(--t1);
+      }
+
+      .finviz-btn {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        z-index: 10;
+        font-size: 11px;
+        font-weight: bold;
+        text-decoration: none;
+        color: var(--green);
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid var(--green);
+        padding: 4px 12px;
+        border-radius: 4px;
+        transition: all 0.2s;
+        box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
+        z-index: 100;
+      }
+
+      .finviz-btn:hover {
+        background: var(--green);
+        color: var(--bg);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        transform: translateY(-1px);
+      }
     }
   </style>
 </head>
@@ -559,14 +708,33 @@
         </div>
         <span>&#x2600;</span>
       </div>
-      <span class="live">&#x25CF; LIVE</span><span id="clock"></span>
+      <div style="font-family:'Share Tech Mono';font-size:16px;color:var(--t1);" id="clock">00:00:00</div>
+      <div
+        style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);border:1px solid var(--green);padding:2px 8px;border-radius:4px;">
+        <span
+          style="width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green);"></span>
+        ONLINE
+      </div>
     </div>
   </header>
+
+  <div class="sentiment-radar">
+    <div class="radar-item">
+      <div style="font-size:11px;color:var(--t3);writing-mode:vertical-rl;transform:rotate(180deg);">CRYPTO F&G</div>
+      <div class="fng-value" id="fng-val">--</div>
+      <div class="fng-label">
+        <span>Sentiment</span>
+        <span class="fng-state" id="fng-text">LOADING...</span>
+      </div>
+    </div>
+    <div class="radar-item radar-vix" id="tv-vix"></div>
+  </div>
+
   <div class="dashboard-grid">
     <div class="panel">
-      <div class="panel-header"><span class="panel-label">&#x25C8; Sector Heatmap</span><span
-          class="panel-tag">S&amp;P500</span></div>
-      <div class="panel-body" style="padding:0;position:relative;">
+      <div class="panel-header"><span class="panel-label">&#x25C8; Sector Heatmap</span><span class="panel-tag">S&P
+          500</span></div>
+      <div class="panel-body">
         <div class="tradingview-widget-container" style="width:100%;height:100%;">
           <div class="tradingview-widget-container__widget" style="width:100%;height:100%;"></div>
           <script type="text/javascript"
@@ -574,8 +742,7 @@
               { "exchanges": [], "dataSource": "SPX500", "grouping": "sector", "blockSize": "market_cap_basic", "blockColor": "change|1M", "locale": "ja", "symbolUrl": "", "colorTheme": "dark", "hasTopBar": false, "isDataSet498Enabled": false, "isZoomEnabled": true, "hasSymbolTooltip": true, "isMonoSize": false, "width": "100%", "height": "100%" }
             </script>
         </div>
-        <a href="https://finviz.com/map.ashx?t=sec&st=w4" target="_blank" rel="noopener"
-          style="position:absolute;bottom:8px;right:8px;font-size:9px;color:var(--t3);text-decoration:none;border:1px solid var(--bdr2);padding:2px 8px;border-radius:2px;background:var(--card);z-index:10;">FINVIZ
+        <a href="https://finviz.com/map.ashx?t=sec&st=w4" target="_blank" rel="noopener" class="finviz-btn">FINVIZ
           &#x2197;</a>
       </div>
     </div>
@@ -642,9 +809,19 @@
           </div>
           <div class="tv-mini" id="tv-slot-2"></div>
         </div>
+        <div class="tv-section">
+          <div class="tv-section-title">Economic Calendar</div>
+          <div class="tv-calendar" id="tv-calendar"></div>
+        </div>
       </div>
     </div>
+  </div> <!-- End Grid -->
+
+  <div class="ticker-wrap">
+    <div class="ticker-label">&#x2261; WHALE WATCHER ( > 50 BTC )</div>
+    <div class="ticker-container" id="ticker-container"></div>
   </div>
+
   <script>
     function updateClock() { const n = new Date(); document.getElementById('clock').textContent = n.toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
     setInterval(updateClock, 1000); updateClock();
@@ -736,7 +913,104 @@
       c.appendChild(s);
     }
 
-    function reloadAllTV() { updateDashboard(); } // Full update on theme change
+    function loadVIX() {
+      const c = document.getElementById('tv-vix');
+      if (!c) return;
+      c.innerHTML = '';
+      const s = document.createElement('script'); s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js'; s.async = true;
+      s.textContent = JSON.stringify({ symbol: "VIX", width: "100%", height: "100%", locale: "ja", dateRange: "1M", colorTheme: getTheme(), isTransparent: true, autosize: true, largeChartUrl: "" });
+      c.appendChild(s);
+    }
+
+    function loadCalendar() {
+      const c = document.getElementById('tv-calendar');
+      if (!c) return;
+      c.innerHTML = '';
+      const s = document.createElement('script'); s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js'; s.async = true;
+      s.textContent = JSON.stringify({ "colorTheme": getTheme(), "isTransparent": true, "width": "100%", "height": "400", "locale": "ja", "importanceFilter": "1", "currencyFilter": "USD,JPY" });
+      c.appendChild(s);
+    }
+
+    async function fetchFearGreed() {
+      try {
+        const res = await fetch('https://api.alternative.me/fng/');
+        const json = await res.json();
+        const data = json.data[0];
+        const val = parseInt(data.value);
+        const text = data.value_classification;
+
+        const elVal = document.getElementById('fng-val');
+        const elText = document.getElementById('fng-text');
+
+        elVal.textContent = val;
+        elText.textContent = text;
+
+        let color = 'var(--t1)';
+        if (val <= 25) color = 'var(--red)';
+        else if (val <= 45) color = 'var(--amber)';
+        else if (val <= 55) color = 'var(--t1)'; // Neutral
+        else if (val <= 75) color = '#a3e635'; // Lime
+        else color = 'var(--green)';
+
+        elVal.style.color = color;
+        elText.style.color = color;
+      } catch (e) { console.error('F&G Error:', e); }
+    }
+
+    function reloadAllTV() { updateDashboard(); loadVIX(); loadCalendar(); } // Full update on theme change
+
+    async function initWhaleWatcher() {
+      const container = document.getElementById('ticker-container');
+      let btcPrice = 95000;
+
+      try {
+        const pRes = await fetch('https://blockchain.info/ticker');
+        const pJson = await pRes.json();
+        btcPrice = pJson.USD.last;
+      } catch (e) { console.warn('BTC Price fetch failed', e); }
+
+      // Performance: Pause if hidden
+      let isVisible = true;
+      document.addEventListener('visibilitychange', () => { isVisible = !document.hidden; });
+
+      const ws = new WebSocket('wss://ws.blockchain.info/inv');
+
+      ws.onopen = () => { ws.send(JSON.stringify({ "op": "unconfirmed_sub" })); };
+
+      ws.onmessage = (msg) => {
+        if (!isVisible) return; // Skip rendering if background
+
+        const data = JSON.parse(msg.data);
+        if (data.op === 'utx') {
+          let totalSats = 0;
+          data.x.out.forEach(o => totalSats += o.value);
+          const btc = totalSats / 100000000;
+          const usd = btc * btcPrice;
+
+          // Threshold: > 50 BTC OR > $5M
+          if (btc >= 50 || usd >= 5000000) {
+
+            // Memory: Max 10 items in DOM
+            if (container.children.length > 10) return; // Don't add if busy (or remove oldest?)
+            // Better: Remove oldest if too many
+            // Actually, animation logic auto-removes on end. 
+            // Just ensure we don't flood.
+
+            const time = new Date(data.x.time * 1000).toLocaleTimeString();
+            const el = document.createElement('div');
+            el.className = 'ticker-item';
+            el.innerHTML = `[${time}] ${btc.toFixed(2)} BTC <span class="whale-val">($${(usd / 1000000).toFixed(1)}M)</span> <span class="whale-hash">${data.x.hash.substring(0, 8)}...</span>`;
+
+            container.appendChild(el);
+
+            // Cleanup on animation end
+            el.addEventListener('animationend', () => {
+              el.remove();
+            });
+          }
+        }
+      };
+    }
 
     function toggleTheme() {
       document.documentElement.classList.toggle('light');
@@ -750,6 +1024,10 @@
 
     // Init
     initSlots();
+    loadVIX();
+    loadCalendar();
+    fetchFearGreed();
+    initWhaleWatcher();
 
     const rawTextData = `
 ASML Holding N.V. (ASML)
