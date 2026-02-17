@@ -524,6 +524,24 @@
       margin-top: 8px;
       letter-spacing: 2px;
     }
+
+    .slot-select {
+      background: var(--bg);
+      color: var(--green);
+      border: 1px solid var(--bdr2);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      padding: 2px 4px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .slot-select option {
+      background: var(--panel);
+      color: var(--t1);
+    }
   </style>
 </head>
 
@@ -601,39 +619,26 @@
                 <th>Div Yield</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><span class="ticker-badge ticker-btc">BTC</span></td>
-                <td style="color:var(--t2)">Crypto</td>
-                <td style="color:var(--t3)">N/A</td>
-                <td style="color:var(--t3)">N/A</td>
-              </tr>
-              <tr>
-                <td><span class="ticker-badge ticker-nvda">NVDA</span></td>
-                <td style="color:var(--t2)">Stock</td>
-                <td id="nvda-per" style="color:var(--amber)">&#x2014;</td>
-                <td id="nvda-div" style="color:var(--green)">&#x2014;</td>
-              </tr>
-              <tr>
-                <td><span class="ticker-badge ticker-slv">SLV</span></td>
-                <td style="color:var(--t2)">ETF</td>
-                <td style="color:var(--t3)">N/A</td>
-                <td id="slv-div" style="color:var(--green)">&#x2014;</td>
-              </tr>
-            </tbody>
+            <tbody id="fundamentals-body"></tbody>
           </table>
         </div>
         <div class="tv-section">
-          <div class="tv-section-title">BTC/USD</div>
-          <div class="tv-mini" id="tv-btc"></div>
+          <div class="panel-header" style="background:none;padding:4px 0;margin-bottom:4px;border:none;">
+            <select id="slot-select-0" class="slot-select"></select>
+          </div>
+          <div class="tv-mini" id="tv-slot-0"></div>
         </div>
         <div class="tv-section">
-          <div class="tv-section-title">NVDA</div>
-          <div class="tv-mini" id="tv-nvda"></div>
+          <div class="panel-header" style="background:none;padding:4px 0;margin-bottom:4px;border:none;">
+            <select id="slot-select-1" class="slot-select"></select>
+          </div>
+          <div class="tv-mini" id="tv-slot-1"></div>
         </div>
         <div class="tv-section">
-          <div class="tv-section-title">SLV</div>
-          <div class="tv-mini" id="tv-slv"></div>
+          <div class="panel-header" style="background:none;padding:4px 0;margin-bottom:4px;border:none;">
+            <select id="slot-select-2" class="slot-select"></select>
+          </div>
+          <div class="tv-mini" id="tv-slot-2"></div>
         </div>
       </div>
     </div>
@@ -643,15 +648,88 @@
     setInterval(updateClock, 1000); updateClock();
 
     function getTheme() { return document.documentElement.classList.contains('light') ? 'light' : 'dark'; }
-    function loadTV(id, sym) { const c = document.getElementById(id); c.innerHTML = ''; const s = document.createElement('script'); s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js'; s.async = true; s.textContent = JSON.stringify({ symbol: sym, width: "100%", height: "100%", locale: "ja", dateRange: "1M", colorTheme: getTheme(), isTransparent: true, autosize: true }); c.appendChild(s); }
+
+    // 7 Strategic Shields Data
+    const shields = {
+      'BTC': { name: 'Bitcoin', symbol: 'BITSTAMP:BTCUSD', type: 'Crypto', per: 'N/A', div: 'N/A' },
+      'NVDA': { name: 'NVIDIA', symbol: 'NASDAQ:NVDA', type: 'Stock', per: '~54.2', div: '~0.03%' },
+      'SLV': { name: 'Silver', symbol: 'AMEX:SLV', type: 'ETF', per: 'N/A', div: '~0.00%' },
+      'BTGO': { name: 'BitGo', symbol: 'NYSE:BTGO', type: 'Stock', per: '—', div: '—' },
+      'PLTR': { name: 'Palantir', symbol: 'NASDAQ:PLTR', type: 'Stock', per: '~260', div: '0%' },
+      'SMH': { name: 'Semicon ETF', symbol: 'NASDAQ:SMH', type: 'ETF', per: '—', div: '~0.6%' },
+      'USDJPY': { name: 'USD/JPY', symbol: 'FX:USDJPY', type: 'Forex', per: 'N/A', div: 'N/A' }
+    };
+    const defaultSlots = ['BTC', 'NVDA', 'SLV'];
+    let currentSlots = JSON.parse(localStorage.getItem('cc-slots')) || defaultSlots;
+
+    function loadTV(containerId, sym) {
+      const c = document.getElementById(containerId);
+      if (!c) return;
+      c.innerHTML = '';
+      const s = document.createElement('script');
+      s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+      s.async = true;
+      s.textContent = JSON.stringify({ symbol: sym, width: "100%", height: "100%", locale: "ja", dateRange: "1M", colorTheme: getTheme(), isTransparent: true, autosize: true });
+      c.appendChild(s);
+    }
+
+    function renderFundamentals() {
+      const tbody = document.getElementById('fundamentals-body');
+      tbody.innerHTML = '';
+      currentSlots.forEach(key => {
+        const d = shields[key];
+        if (!d) return;
+        const color = key === 'BTC' ? '#f97316' : key === 'NVDA' ? '#10b981' : key === 'SLV' ? '#94a3b8' : 'var(--green)';
+        const bg = key === 'BTC' ? 'rgba(249,115,22,.15)' : key === 'NVDA' ? 'rgba(16,185,129,.15)' : key === 'SLV' ? 'rgba(148,163,184,.15)' : 'rgba(0,255,136,.1)';
+        const style = `background:${bg};color:${color};border:1px solid ${color}`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><span class="ticker-badge" style="${style}">${key}</span></td>
+          <td style="color:var(--t2)">${d.type}</td>
+          <td style="color:var(--amber)">${d.per}</td>
+          <td style="color:var(--green)">${d.div}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateDashboard() {
+      renderFundamentals();
+      currentSlots.forEach((key, idx) => {
+        const d = shields[key];
+        if (d) loadTV(`tv-slot-${idx}`, d.symbol);
+      });
+      loadHeatmap();
+    }
+
+    function initSlots() {
+      [0, 1, 2].forEach(idx => {
+        const sel = document.getElementById(`slot-select-${idx}`);
+        Object.keys(shields).forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k;
+          opt.textContent = `${k} - ${shields[k].name}`;
+          if (k === currentSlots[idx]) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        sel.onchange = (e) => {
+          currentSlots[idx] = e.target.value;
+          localStorage.setItem('cc-slots', JSON.stringify(currentSlots));
+          updateDashboard();
+        };
+      });
+      updateDashboard();
+    }
+
     function loadHeatmap() {
       const c = document.querySelector('.tradingview-widget-container');
+      if (!c) return;
       c.innerHTML = '<div class="tradingview-widget-container__widget" style="width:100%;height:100%;"></div>';
       const s = document.createElement('script'); s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js'; s.async = true;
       s.textContent = JSON.stringify({ exchanges: [], dataSource: "SPX500", grouping: "sector", blockSize: "market_cap_basic", blockColor: "change|1M", locale: "ja", symbolUrl: "", colorTheme: getTheme(), hasTopBar: false, isDataSet498Enabled: false, isZoomEnabled: true, hasSymbolTooltip: true, isMonoSize: false, width: "100%", height: "100%" });
       c.appendChild(s);
     }
-    function reloadAllTV() { loadTV('tv-btc', 'BITSTAMP:BTCUSD'); loadTV('tv-nvda', 'NASDAQ:NVDA'); loadTV('tv-slv', 'AMEX:SLV'); loadHeatmap(); }
+
+    function reloadAllTV() { updateDashboard(); } // Alias for theme toggle
+
     function toggleTheme() {
       document.documentElement.classList.toggle('light');
       const isLight = getTheme() === 'light';
@@ -661,11 +739,9 @@
     }
     if (localStorage.getItem('cc-theme') === 'light') document.documentElement.classList.add('light');
     document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-    reloadAllTV();
 
-    document.getElementById('nvda-per').textContent = '~54.2';
-    document.getElementById('nvda-div').textContent = '~0.03%';
-    document.getElementById('slv-div').textContent = '~0.00%';
+    // Init
+    initSlots();
 
     const rawTextData = `
 ASML Holding N.V. (ASML)
